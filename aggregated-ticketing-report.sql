@@ -17,21 +17,21 @@ from (
 				) 
 		) TOTAL_COMP
 		,sum(if('adjust'=t.method, t.amount, 0)) as ADJUSTMENTS
-	from t2 t, regis ra 
+	from t2 t, attendee ra 
 	where 1=1
 	and t.status='a' 
-	and ra.id=t.regis_id 
-	and ra.status in ('a') -- or a list of statuses....
+	and ra.id=t.attendee_id 
+	and ra.status in ('a')
 	and ra.id in (
 		select ra.id 
-		from regis ra, transact t 
-		where ra.id=t.regis_id 
+		from attendee ra, transact t 
+		where ra.id=t.attendee_id 
 		and ra.reg_id in
 			(select reg_id from (
 				select reg_id,sum(amount) as amt from transact where status='a' group by reg_id having amt<=0
 			) x1 )
 		and ra.status='a' and t.method='fee' and t.status='a' and (t.tickettype<>'') 
 	)
-
+	and ra.reg_id not in (/* exclude IDs here */)
 	group by t.tickettype
 ) derived_table_1
